@@ -1,0 +1,16 @@
+#!/bin/bash
+# ~/.local/bin/derive-nvim-syntax-colors
+#
+# Reads the Quickshell-generated kitty theme and produces
+# a perceptually-uniform syntax palette for nvim.
+
+KITTY_THEME="$HOME/.local/state/quickshell/user/generated/terminal/kitty-theme.conf"
+OUTPUT="$HOME/.config/nvim/lua/matugen/syntax_colors.lua"
+SCRIPT="$HOME/.local/bin/derive_syntax_colors.py"
+
+if [ ! -f "$KITTY_THEME" ]; then
+    echo "kitty-theme.conf not found, skipping" >&2
+    exit 0
+fi
+
+exec python3 "$SCRIPT" "$KITTY_THEME" "$OUTPUT"
