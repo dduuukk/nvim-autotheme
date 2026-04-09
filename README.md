@@ -1,6 +1,5 @@
 # nvim-autotheme
 
-_\*README generated with AI_
 Automatically sync your Neovim colorscheme with your wallpaper using **matugen + systemd**.
 
 ## ✨ Features
