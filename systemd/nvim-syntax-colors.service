@@ -1,0 +1,20 @@
+# ~/.config/systemd/user/nvim-syntax-colors.service
+#
+# Triggered by nvim-syntax-colors.path when kitty-theme.conf changes.
+# Runs the derivation script, then signals nvim to reload via --remote-send.
+
+[Unit]
+Description=Derive nvim syntax colors from kitty theme
+
+[Service]
+Type=oneshot
+
+# Small delay — Quickshell may still be flushing the file
+ExecStartPre=/usr/bin/sleep 0.3
+
+# Run the derivation
+ExecStart=%h/.local/bin/derive-nvim-syntax-colors
+
+# Signal all running nvim instances to reload the colorscheme
+# Uses nvim's --server/--remote-send to send a command to each instance
+ExecStartPost=/bin/bash -c 'for sock in /run/user/%U/nvim.*.0 /tmp/nvim.*/0; do [ -S "$sock" ] && nvim --server "$sock" --remote-send "<Cmd>colorscheme matugen<CR>" 2>/dev/null || true; done'

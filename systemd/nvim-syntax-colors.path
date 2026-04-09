@@ -1,0 +1,21 @@
+# ~/.config/systemd/user/nvim-syntax-colors.path
+#
+# Watches the Quickshell-generated kitty theme file.
+# When it changes, triggers nvim-syntax-colors.service
+# which re-derives the syntax palette.
+#
+# Install:
+#   mkdir -p ~/.config/systemd/user
+#   cp nvim-syntax-colors.path ~/.config/systemd/user/
+#   cp nvim-syntax-colors.service ~/.config/systemd/user/
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now nvim-syntax-colors.path
+
+[Unit]
+Description=Watch kitty-theme.conf for syntax color derivation
+
+[Path]
+PathModified=%h/.local/state/quickshell/user/generated/terminal/kitty-theme.conf
+
+[Install]
+WantedBy=default.target
