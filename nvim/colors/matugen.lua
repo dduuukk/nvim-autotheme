@@ -1,24 +1,14 @@
 -- ~/.config/nvim/colors/matugen.lua
 --
--- Two-layer color scheme:
---   Syntax highlighting → derived from kitty ANSI palette (perceptually uniform)
---   UI chrome           → MD3 tokens from matugen (surface/container hierarchy)
+-- Colorscheme derived from kitty ANSI palette (perceptually uniform in OKLCH)
 --
 -- Requires:
---   matugen/colors.lua         (MD3 tokens, written by matugen template)
 --   matugen/syntax_colors.lua  (derived palette, written by derive_syntax_colors.py)
 
 local M = {}
 
 function M.load()
-	-- Load MD3 tokens for UI chrome (surfaces, containers, borders)
-	local ok_md3, md3 = pcall(require, "matugen.colors")
-	if not ok_md3 then
-		vim.notify("[matugen] colors.lua not found — run matugen first", vim.log.levels.WARN)
-		return false
-	end
-
-	-- Load derived syntax palette (from kitty-theme.conf)
+	-- Load derived syntax palette (from kitty-theme.conf) — this is the only required file
 	local ok_syn, syn = pcall(require, "matugen.syntax_colors")
 	if not ok_syn then
 		vim.notify("[matugen] syntax_colors.lua not found — run derive-nvim-syntax-colors", vim.log.levels.WARN)
@@ -26,7 +16,6 @@ function M.load()
 	end
 
 	-- Force re-read on next colorscheme load (so hot-reload works)
-	package.loaded["matugen.colors"] = nil
 	package.loaded["matugen.syntax_colors"] = nil
 
 	vim.cmd("highlight clear")
@@ -42,8 +31,7 @@ function M.load()
 	-- ── Design rules ────────────────────────────────────────────────────────
 	-- ONLY comments are italic
 	-- bold = structural importance (keywords, function defs)
-	-- Syntax colors come from `syn` (perceptually uniform, derived from kitty)
-	-- UI colors come from `md3` (Material Design surface hierarchy)
+	-- All colors from `syn` (perceptually uniform, derived from kitty)
 
 	-- ── Base ────────────────────────────────────────────────────────────────
 	-- Background/foreground from kitty (so nvim matches the terminal exactly)
@@ -162,7 +150,7 @@ function M.load()
 	hl("@lsp.type.decorator", { fg = syn.preproc })
 	hl("@lsp.type.property", { fg = syn.field })
 
-	-- ── UI chrome (MD3 surfaces still make sense here) ──────────────────────
+	-- ── UI chrome ─────────────────────────────────────────────────────────
 	hl("StatusLine", { fg = syn.param, bg = syn.bg })
 	hl("StatusLineNC", { fg = syn.comment, bg = syn.bg })
 	hl("WinSeparator", { fg = syn.surface_3 })
@@ -197,13 +185,9 @@ function M.load()
 	hl("DiagnosticUnderlineHint", { undercurl = true, sp = syn.comment })
 
 	-- ── Git / Diff ──────────────────────────────────────────────────────────
-	-- Use MD3 containers here if available, fall back to derived surfaces
-	local diff_add_bg = md3.secondary_container or syn.surface_2
-	local diff_del_bg = md3.error_container or syn.surface_2
-
-	hl("DiffAdd", { bg = diff_add_bg })
+	hl("DiffAdd", { bg = syn.surface_2 })
 	hl("DiffChange", { bg = syn.surface_3 })
-	hl("DiffDelete", { fg = syn.error, bg = diff_del_bg })
+	hl("DiffDelete", { fg = syn.error, bg = syn.surface_2 })
 	hl("DiffText", { fg = syn.bg, bg = syn.keyword, bold = true })
 
 	hl("GitSignsAdd", { fg = syn.constant })
@@ -244,5 +228,7 @@ function M.load()
 	return true
 end
 
+-- Actually apply the highlights when :colorscheme sources this file
 M.load()
+
 return M
